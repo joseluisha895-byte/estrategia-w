@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Selección de Mods — Estrategia W</title>
+
+  <!-- ========================================================
+       FUENTES
+       Cinzel Decorative → título principal
+       Cinzel            → etiquetas, nombres, botones
+       IM Fell English   → descripción de cada mod (sabor literario)
+  ======================================================== -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@400;600;700&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet" />
+
+  <!-- ========================================================
+       HOJA DE ESTILOS
+       Archivo: seleccion-mods.css (en esta misma carpeta)
+  ======================================================== -->
+  <link rel="stylesheet" href="seleccion-mods.css" />
+</head>
+<body>
+
+  <!-- Fondo hexagonal animado (igual que el resto del juego) -->
+  <canvas id="bg"></canvas>
+
+  <!-- ========================================================
+       LAYOUT PRINCIPAL — dos columnas
+       Izquierda: lista de mods disponibles
+       Derecha:   detalle del mod seleccionado
+  ======================================================== -->
+  <div class="stage">
+
+    <!-- CABECERA -->
+    <header class="cabecera">
+      <div class="cabecera-left">
+        <!-- Botón volver al paso anterior (nombre de partida)
+             onclick → regresar() en seleccion-mods.js -->
+        <button class="btn-volver" onclick="regresar()">◀ Volver</button>
+      </div>
+
+      <div class="cabecera-center">
+        <p class="cabecera-sub">Estrategia W</p>
+        <h1 class="cabecera-titulo">Selección de Mods</h1>
+      </div>
+
+      <div class="cabecera-right">
+        <!-- Nombre de la partida que viene del paso anterior
+             Rellenado por seleccion-mods.js al cargar
+             id="partida-label" → referenciado en seleccion-mods.js -->
+        <div class="partida-badge">
+          <span class="partida-badge-label">Partida</span>
+          <span class="partida-badge-nombre" id="partida-label">—</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- CUERPO PRINCIPAL -->
+    <main class="cuerpo">
+
+      <!-- ====================================================
+           COLUMNA IZQUIERDA — Lista de mods
+           Los .mod-card se generan dinámicamente por seleccion-mods.js
+           Al hacer click en una card → seleccionarMod(id)
+      ==================================================== -->
+      <section class="col-lista">
+        <div class="lista-header">
+          <span class="lista-titulo">Mods Disponibles</span>
+          <!-- Contador: "X / Y activos" actualizado por seleccion-mods.js
+               id="contador-mods" → referenciado en seleccion-mods.js -->
+          <span class="lista-contador" id="contador-mods">0 activos</span>
+        </div>
+
+        <!-- Contenedor donde seleccion-mods.js inyecta las cards
+             id="lista-mods" → referenciado en seleccion-mods.js -->
+        <div class="lista-mods" id="lista-mods">
+          <!-- Generado dinámicamente por seleccion-mods.js -->
+        </div>
+      </section>
+
+      <!-- ====================================================
+           COLUMNA DERECHA — Detalle del mod seleccionado
+           Actualizado por seleccion-mods.js → verDetalle(mod)
+      ==================================================== -->
+      <section class="col-detalle" id="col-detalle">
+
+        <!-- Estado vacío: cuando ningún mod está seleccionado -->
+        <div class="detalle-vacio" id="detalle-vacio">
+          <div class="detalle-vacio-icono">⚙</div>
+          <p class="detalle-vacio-texto">Selecciona un mod<br>para ver su descripción</p>
+        </div>
+
+        <!-- Contenido del detalle (oculto hasta seleccionar un mod)
+             Rellenado por seleccion-mods.js → verDetalle(mod) -->
+        <div class="detalle-contenido" id="detalle-contenido" style="display:none">
+
+          <!-- Thumbnail del mod
+               src rellenado por seleccion-mods.js
+               id="det-thumbnail" → referenciado en seleccion-mods.js -->
+          <div class="det-thumbnail-wrap">
+            <img class="det-thumbnail" id="det-thumbnail" src="" alt="Thumbnail del mod" />
+            <!-- Badge "Requerido" si el mod no se puede desactivar -->
+            <span class="det-badge-req" id="det-badge-req" style="display:none">Requerido</span>
+          </div>
+
+          <!-- Nombre y versión -->
+          <div class="det-header">
+            <h2 class="det-nombre" id="det-nombre">—</h2>
+            <span class="det-version" id="det-version">v0.0</span>
+          </div>
+
+          <!-- Autor -->
+          <p class="det-autor" id="det-autor">—</p>
+
+          <!-- Etiquetas del mod (gameplay, visual, recursos, etc.)
+               Generadas por seleccion-mods.js
+               id="det-etiquetas" → referenciado en seleccion-mods.js -->
+          <div class="det-etiquetas" id="det-etiquetas"></div>
+
+          <!-- Separador -->
+          <div class="det-sep" aria-hidden="true"></div>
+
+          <!-- Descripción larga del mod -->
+          <p class="det-descripcion" id="det-descripcion">—</p>
+
+          <!-- Dependencias del mod
+               id="det-deps-wrap" → mostrado/ocultado por seleccion-mods.js -->
+          <div class="det-deps" id="det-deps-wrap" style="display:none">
+            <span class="det-deps-label">Requiere:</span>
+            <span class="det-deps-lista" id="det-deps-lista"></span>
+          </div>
+
+          <!-- Botón toggle: activar / desactivar este mod
+               Controlado por seleccion-mods.js → toggleMod(id)
+               id="btn-toggle" → referenciado en seleccion-mods.js -->
+          <button class="btn-toggle" id="btn-toggle" onclick="toggleMod()">
+            Activar Mod
+          </button>
+
+        </div><!-- /.detalle-contenido -->
+
+      </section><!-- /.col-detalle -->
+
+    </main><!-- /.cuerpo -->
+
+    <!-- ========================================================
+         PIE — Selector de tamaño + botón iniciar
+         El selector escribe en seleccion-mods.js → tamanoElegido
+         id="selector-tamano" → referenciado en seleccion-mods.js
+    ======================================================== -->
+    <footer class="pie">
+
+      <!-- Selector de tamaño del mundo
+           Las 3 opciones llaman a elegirTamano() en seleccion-mods.js -->
+      <div class="tamano-wrap">
+        <span class="tamano-label">Tamaño del Mundo</span>
+        <div class="tamano-opciones">
+
+          <button class="tamano-btn" id="tam-pequeno"
+                  onclick="elegirTamano('pequeno')"
+                  title="~200 hexágonos · Partida corta">
+            <span class="tamano-icono">◈</span>
+            <span class="tamano-nombre">Pequeño</span>
+          </button>
+
+          <button class="tamano-btn tamano-activo" id="tam-mediano"
+                  onclick="elegirTamano('mediano')"
+                  title="~500 hexágonos · Partida estándar">
+            <span class="tamano-icono">◈◈</span>
+            <span class="tamano-nombre">Mediano</span>
+          </button>
+
+          <button class="tamano-btn" id="tam-grande"
+                  onclick="elegirTamano('grande')"
+                  title="~1000 hexágonos · Partida larga">
+            <span class="tamano-icono">◈◈◈</span>
+            <span class="tamano-nombre">Grande</span>
+          </button>
+
+        </div>
+      </div>
+
+      <div class="pie-derecha">
+        <p class="pie-hint" id="pie-hint">Activa al menos un mod para continuar</p>
+        <button class="btn-jugar" id="btn-jugar" onclick="iniciarJuego()" disabled>
+          <span class="btn-jugar-texto">⚔ Comenzar Partida</span>
+        </button>
+      </div>
+
+    </footer>
+
+  </div><!-- /.stage -->
+
+  <!-- ========================================================
+       SCRIPT DE ESTA PANTALLA
+       Archivo: seleccion-mods.js (en esta misma carpeta)
+       Maneja: carga de mods, selección, toggle, iniciar juego
+       Lee el nombre de la partida desde localStorage (ew_partida_actual)
+       escrita por nueva-partida.js al presionar "Jugar"
+  ======================================================== -->
+  <script src="seleccion-mods.js"></script>
+
+</body>
+</html>
