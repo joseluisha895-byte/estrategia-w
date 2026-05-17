@@ -1,0 +1,388 @@
+/* ================================================================
+   nueva-partida.css — Estilos de la pantalla "Nueva Partida"
+   Referenciado en: nueva-partida.html
+   Comparte la misma paleta y tipografía que menu.css para
+   mantener coherencia visual en todo el juego.
+================================================================ */
+
+
+/* ----------------------------------------------------------------
+   VARIABLES GLOBALES DE COLOR Y TEMA
+   Idénticas a las de menu.css para consistencia visual.
+   Si cambias los colores del juego, actualiza ambos archivos.
+---------------------------------------------------------------- */
+:root {
+  --gold:      #c9a84c;
+  --gold-lt:   #e8c96a;
+  --gold-dk:   #7a5c1a;
+  --bg:        #0a0a0f;
+  --panel:     rgba(12, 10, 6, 0.85);
+  --red:       #8b1a1a;
+  --red-lt:    #b52222;
+  --green:     #2a6e3f;
+  --green-lt:  #3a9e58;
+}
+
+
+/* ----------------------------------------------------------------
+   RESET Y BODY
+   Igual que en menu.css para mantener la misma base visual.
+---------------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--gold);
+  font-family: 'Cinzel', serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+
+/* ----------------------------------------------------------------
+   CANVAS DE FONDO HEXAGONAL
+   Mismo estilo que en menu.css.
+   El dibujo lo maneja nueva-partida.js.
+   El elemento está en nueva-partida.html (<canvas id="bg">)
+---------------------------------------------------------------- */
+canvas#bg {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: .55;
+  pointer-events: none;
+}
+
+/* Viñeta oscura sobre el fondo */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 35%, #000 100%);
+  pointer-events: none;
+}
+
+
+/* ----------------------------------------------------------------
+   ANIMACIÓN: fadeIn
+   Usada en varios elementos para la entrada suave al cargar.
+---------------------------------------------------------------- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+
+/* ----------------------------------------------------------------
+   .stage — Contenedor principal
+   Referenciado en: nueva-partida.html (<div class="stage">)
+---------------------------------------------------------------- */
+.stage {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  animation: fadeIn 1.4s ease both;
+}
+
+
+/* ----------------------------------------------------------------
+   .ornament — Ornamento decorativo superior
+   Referenciado en: nueva-partida.html (<div class="ornament">)
+   Idéntico al de menu.css
+---------------------------------------------------------------- */
+.ornament {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  animation: fadeIn 1.4s .15s ease both;
+}
+.ornament-line {
+  width: 90px;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--gold));
+}
+.ornament-line.flip {
+  background: linear-gradient(to left, transparent, var(--gold));
+}
+.ornament svg {
+  width: 22px;
+  height: 22px;
+  fill: var(--gold);
+  opacity: .8;
+}
+
+
+/* ----------------------------------------------------------------
+   .title-wrap, .subtitle, h1 — Bloque del título
+   Referenciado en: nueva-partida.html (<div class="title-wrap">)
+---------------------------------------------------------------- */
+.title-wrap {
+  text-align: center;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.subtitle {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(.65rem, 1.2vw, .8rem);
+  letter-spacing: .45em;
+  color: var(--gold-dk);
+  text-transform: uppercase;
+  animation: fadeIn 1.4s .2s ease both;
+}
+h1 {
+  font-family: 'Cinzel Decorative', cursive;
+  font-size: clamp(2rem, 5vw, 3.8rem);
+  font-weight: 900;
+  letter-spacing: .08em;
+  color: transparent;
+  background: linear-gradient(170deg, var(--gold-lt) 20%, var(--gold) 50%, var(--gold-dk) 80%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  filter: drop-shadow(0 0 22px rgba(201,168,76,.35));
+  animation: fadeIn 1.4s .1s ease both;
+}
+
+
+/* ----------------------------------------------------------------
+   .sep — Línea separadora
+   Referenciado en: nueva-partida.html (<div class="sep">)
+---------------------------------------------------------------- */
+.sep {
+  width: 260px;
+  height: 1px;
+  margin: 20px 0 26px;
+  background: linear-gradient(to right, transparent, var(--gold), transparent);
+  animation: fadeIn 1.4s .3s ease both;
+}
+
+
+/* ----------------------------------------------------------------
+   .panel — Panel principal con el formulario y botones
+   Referenciado en: nueva-partida.html (<div class="panel">)
+---------------------------------------------------------------- */
+.panel {
+  background: var(--panel);
+  border: 1px solid rgba(201,168,76,.2);
+  border-radius: 2px;
+  padding: 36px 48px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  position: relative;
+  backdrop-filter: blur(6px);
+  animation: fadeIn 1.4s .4s ease both;
+  min-width: 340px;
+  max-width: 460px;
+  width: 90vw;
+}
+
+/* Esquinas decorativas del panel (igual que en menu.css) */
+.panel::before,
+.panel::after {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-color: var(--gold);
+  border-style: solid;
+  opacity: .6;
+}
+.panel::before { top: -1px;    left: -1px;  border-width: 2px 0 0 2px; }
+.panel::after  { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+
+
+/* ----------------------------------------------------------------
+   .field-group, .field-label, .field-input — Campo de texto
+   Referenciado en: nueva-partida.html (<div class="field-group">)
+   El valor del input es leído por nueva-partida.js
+---------------------------------------------------------------- */
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field-label {
+  font-family: 'Cinzel', serif;
+  font-size: .7rem;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--gold-dk);
+}
+
+.field-input {
+  background: rgba(201,168,76,.04);
+  border: 1px solid rgba(201,168,76,.3);
+  border-radius: 2px;
+  color: var(--gold-lt);
+  font-family: 'Cinzel', serif;
+  font-size: .9rem;
+  letter-spacing: .1em;
+  padding: 12px 16px;
+  outline: none;
+  transition: border-color .25s, background .25s;
+  width: 100%;
+}
+
+.field-input::placeholder {
+  color: rgba(201,168,76,.25);
+  font-style: italic;
+}
+
+/* Resaltado al enfocar el campo */
+.field-input:focus {
+  border-color: var(--gold);
+  background: rgba(201,168,76,.08);
+}
+
+
+/* ----------------------------------------------------------------
+   .field-msg — Mensaje de estado bajo el input
+   Mostrado/ocultado desde nueva-partida.js
+   Cambia de color según si es error (.error) o éxito (.ok)
+   id="field-msg" → referenciado en nueva-partida.js
+---------------------------------------------------------------- */
+.field-msg {
+  font-size: .65rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  min-height: 1em;
+  transition: color .2s;
+  color: transparent; /* Invisible por defecto */
+}
+.field-msg.error { color: var(--red-lt); }
+.field-msg.ok    { color: var(--green-lt); }
+
+
+/* ----------------------------------------------------------------
+   .btn-group — Contenedor de los botones de acción
+   Referenciado en: nueva-partida.html (<div class="btn-group">)
+---------------------------------------------------------------- */
+.btn-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+
+/* ----------------------------------------------------------------
+   .btn — Estilo base de botón (igual que en menu.css)
+   Referenciado en: nueva-partida.html (<button class="btn">)
+   Los onclick de cada botón llaman a funciones de nueva-partida.js
+---------------------------------------------------------------- */
+.btn {
+  position: relative;
+  background: none;
+  border: 1px solid rgba(201,168,76,.25);
+  color: var(--gold);
+  font-family: 'Cinzel', serif;
+  font-size: clamp(.75rem, 1.4vw, .88rem);
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  padding: 13px 28px;
+  cursor: pointer;
+  transition: border-color .25s, color .25s, background .25s;
+  overflow: hidden;
+  text-align: center;
+}
+
+/* Efecto de barrido de luz al hover */
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(201,168,76,.12), transparent);
+  transform: translateX(-100%);
+  transition: transform .4s ease;
+}
+.btn:hover::before { transform: translateX(100%); }
+
+.btn:hover {
+  border-color: var(--gold);
+  color: var(--gold-lt);
+  background: rgba(201,168,76,.06);
+}
+.btn:active { transform: scale(.98); }
+
+/* Flecha animada dentro del botón */
+.btn span.arrow {
+  display: inline-block;
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity .25s, transform .25s;
+  margin-right: 8px;
+  font-size: .85em;
+}
+.btn:hover span.arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+
+/* ----------------------------------------------------------------
+   VARIANTES DE BOTÓN
+   .btn-primary → Guardar   (dorado resaltado)
+   .btn-play    → Jugar     (verde: acción positiva)
+   .btn-danger  → Eliminar  (rojo: acción destructiva)
+   Referenciados en: nueva-partida.html
+---------------------------------------------------------------- */
+.btn-primary {
+  border-color: rgba(201,168,76,.55);
+  background: rgba(201,168,76,.05);
+}
+.btn-primary:hover { background: rgba(201,168,76,.12); }
+
+.btn-play {
+  border-color: rgba(42,110,63,.7);
+  background: rgba(42,110,63,.08);
+  color: #5ecb82;
+}
+.btn-play:hover {
+  border-color: var(--green-lt);
+  background: rgba(42,110,63,.18);
+  color: #7eeea0;
+}
+.btn-play::before {
+  background: linear-gradient(90deg, transparent, rgba(42,110,63,.2), transparent);
+}
+
+.btn-danger {
+  border-color: rgba(139,26,26,.6);
+  background: rgba(139,26,26,.06);
+  color: #d46060;
+}
+.btn-danger:hover {
+  border-color: var(--red-lt);
+  background: rgba(139,26,26,.15);
+  color: #f08080;
+}
+.btn-danger::before {
+  background: linear-gradient(90deg, transparent, rgba(139,26,26,.2), transparent);
+}
+
+
+/* ----------------------------------------------------------------
+   .version — Texto de versión
+   Referenciado en: nueva-partida.html (<p class="version">)
+---------------------------------------------------------------- */
+.version {
+  margin-top: 22px;
+  font-size: .65rem;
+  letter-spacing: .3em;
+  color: var(--gold-dk);
+  text-transform: uppercase;
+  animation: fadeIn 1.6s .8s ease both;
+}

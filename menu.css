@@ -1,0 +1,328 @@
+/* ================================================================
+   menu.css — Estilos del menú de inicio de Estrategia W
+   Referenciado en: index.html  (<link rel="stylesheet" href="menu.css">)
+   Fuentes utilizadas: Cinzel Decorative, Cinzel
+     → cargadas en index.html vía Google Fonts
+================================================================ */
+
+
+/* ----------------------------------------------------------------
+   VARIABLES GLOBALES DE COLOR Y TEMA
+   Usadas con var(--nombre) en todo este archivo.
+   Si cambias un color aquí, se actualiza en todo el CSS.
+---------------------------------------------------------------- */
+:root {
+  --gold:    #c9a84c;               /* Dorado principal */
+  --gold-lt: #e8c96a;               /* Dorado claro (hover, brillos) */
+  --gold-dk: #7a5c1a;               /* Dorado oscuro (subtítulo, versión) */
+  --bg:      #0a0a0f;               /* Fondo negro azulado */
+  --panel:   rgba(12, 10, 6, 0.85); /* Fondo semitransparente del panel */
+  --smoke:   rgba(201, 168, 76, 0.07);
+  --red:     #8b1a1a;               /* Reservado para alertas / enemigos */
+}
+
+
+/* ----------------------------------------------------------------
+   RESET BÁSICO
+   Elimina márgenes y paddings por defecto del navegador.
+---------------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+
+/* ----------------------------------------------------------------
+   BODY — Contenedor raíz
+   Centra todo el contenido con flexbox.
+   El color y la fuente base se heredan a los elementos hijos.
+---------------------------------------------------------------- */
+body {
+  background: var(--bg);
+  color: var(--gold);
+  font-family: 'Cinzel', serif; /* Fuente cargada en index.html */
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+
+/* ----------------------------------------------------------------
+   CANVAS DE FONDO HEXAGONAL
+   El elemento <canvas id="bg"> vive en index.html.
+   Su tamaño y dibujo son controlados por menu.js.
+   Aquí solo se define su posición y opacidad visual.
+---------------------------------------------------------------- */
+canvas#bg {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: .55;
+  pointer-events: none; /* No intercepta clics del usuario */
+}
+
+
+/* ----------------------------------------------------------------
+   VIÑETA OSCURA
+   Gradiente radial sobre el body que oscurece los bordes
+   y hace que el menú central resalte más.
+---------------------------------------------------------------- */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 35%, #000 100%);
+  pointer-events: none;
+}
+
+
+/* ----------------------------------------------------------------
+   .stage — Contenedor principal del menú
+   Agrupa todos los elementos visibles (ornamento, título, panel).
+   Referenciado en: index.html  (<div class="stage">)
+---------------------------------------------------------------- */
+.stage {
+  position: relative;
+  z-index: 10; /* Queda por encima del canvas y la viñeta */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  animation: fadeIn 1.8s ease both;
+}
+
+
+/* ----------------------------------------------------------------
+   ANIMACIÓN: fadeIn
+   Usada por .stage, .ornament, h1, .sep, .menu-panel, .version
+   para que cada elemento aparezca suavemente al cargar la página.
+---------------------------------------------------------------- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+
+/* ----------------------------------------------------------------
+   .ornament — Líneas decorativas + ícono estrella
+   Referenciado en: index.html  (<div class="ornament">)
+   El SVG de la estrella está incrustado directamente en el HTML.
+---------------------------------------------------------------- */
+.ornament {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  animation: fadeIn 1.8s .2s ease both;
+}
+
+/* Línea dorada que se desvanece hacia un lado */
+.ornament-line {
+  width: 90px;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--gold));
+}
+
+/* Variante invertida (usada en la línea izquierda) */
+.ornament-line.flip {
+  background: linear-gradient(to left, transparent, var(--gold));
+}
+
+/* Tamaño del ícono SVG dentro del ornamento */
+.ornament svg {
+  width: 22px;
+  height: 22px;
+  fill: var(--gold);
+  opacity: .8;
+}
+
+
+/* ----------------------------------------------------------------
+   .title-wrap, .subtitle, h1 — Bloque del título del juego
+   Referenciado en: index.html  (<div class="title-wrap">)
+---------------------------------------------------------------- */
+.title-wrap {
+  text-align: center;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+/* Texto pequeño sobre el título: "El Gran Tablero" */
+.subtitle {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(.65rem, 1.2vw, .8rem);
+  letter-spacing: .45em;
+  color: var(--gold-dk);
+  text-transform: uppercase;
+  animation: fadeIn 1.8s .3s ease both;
+}
+
+/* Título principal "Estrategia W"
+   Usa gradiente de color para simular efecto metálico dorado. */
+h1 {
+  font-family: 'Cinzel Decorative', cursive; /* Fuente cargada en index.html */
+  font-size: clamp(2.6rem, 7vw, 5.2rem);
+  font-weight: 900;
+  letter-spacing: .08em;
+  line-height: 1.1;
+  color: transparent;
+  background: linear-gradient(170deg, var(--gold-lt) 20%, var(--gold) 50%, var(--gold-dk) 80%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  filter: drop-shadow(0 0 28px rgba(201,168,76,.35));
+  /* Encadenamos dos animaciones: aparición + pulso infinito */
+  animation: fadeIn 1.8s .1s ease both, pulse 4s 2s ease-in-out infinite;
+}
+
+/* Pulso de brillo sobre el título (se repite indefinidamente) */
+@keyframes pulse {
+  0%,100% { filter: drop-shadow(0 0 20px rgba(201,168,76,.3)); }
+  50%      { filter: drop-shadow(0 0 40px rgba(201,168,76,.6)); }
+}
+
+
+/* ----------------------------------------------------------------
+   .sep — Línea separadora entre el título y el panel del menú
+   Referenciado en: index.html  (<div class="sep">)
+---------------------------------------------------------------- */
+.sep {
+  width: 260px;
+  height: 1px;
+  margin: 22px 0 30px;
+  background: linear-gradient(to right, transparent, var(--gold), transparent);
+  animation: fadeIn 1.8s .4s ease both;
+}
+
+
+/* ----------------------------------------------------------------
+   .menu-panel — Panel que contiene los botones del menú
+   Referenciado en: index.html  (<nav class="menu-panel">)
+   Los botones dentro llaman a accion() definida en menu.js
+---------------------------------------------------------------- */
+.menu-panel {
+  background: var(--panel);
+  border: 1px solid rgba(201,168,76,.2);
+  border-radius: 2px;
+  padding: 36px 52px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  position: relative;
+  backdrop-filter: blur(6px); /* Efecto de vidrio esmerilado */
+  animation: fadeIn 1.8s .5s ease both;
+  min-width: 300px;
+}
+
+/* Esquinas decorativas del panel (líneas en L en las esquinas) */
+.menu-panel::before,
+.menu-panel::after {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-color: var(--gold);
+  border-style: solid;
+  opacity: .6;
+}
+.menu-panel::before { top: -1px;    left: -1px;  border-width: 2px 0 0 2px; } /* Esquina sup-izq */
+.menu-panel::after  { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; } /* Esquina inf-der */
+
+
+/* ----------------------------------------------------------------
+   .btn — Estilo base para todos los botones del menú
+   Referenciado en: index.html  (<button class="btn">)
+   Los onclick de cada botón apuntan a accion() en menu.js
+---------------------------------------------------------------- */
+.btn {
+  position: relative;
+  background: none;
+  border: 1px solid rgba(201,168,76,.25);
+  color: var(--gold);
+  font-family: 'Cinzel', serif;
+  font-size: clamp(.8rem, 1.5vw, .95rem);
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  padding: 14px 32px;
+  cursor: pointer;
+  transition: border-color .25s, color .25s, background .25s;
+  overflow: hidden;
+  text-align: center;
+}
+
+/* Efecto de barrido de luz al hacer hover (pseudo-elemento animado) */
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(201,168,76,.12) 50%, transparent 100%);
+  transform: translateX(-100%);
+  transition: transform .4s ease;
+}
+.btn:hover::before {
+  transform: translateX(100%); /* El barrido recorre el botón de izq a der */
+}
+
+/* Estado hover del botón */
+.btn:hover {
+  border-color: var(--gold);
+  color: var(--gold-lt);
+  background: rgba(201,168,76,.06);
+}
+
+/* Pequeño efecto de "presión" al hacer click */
+.btn:active {
+  transform: scale(.98);
+}
+
+
+/* ----------------------------------------------------------------
+   .btn-primary — Variante destacada (Nuevo Juego)
+   Se combina con .btn: <button class="btn btn-primary">
+   Tiene un borde y fondo ligeramente más visibles que los demás.
+---------------------------------------------------------------- */
+.btn-primary {
+  border-color: rgba(201,168,76,.55);
+  background: rgba(201,168,76,.05);
+}
+.btn-primary:hover {
+  background: rgba(201,168,76,.12);
+}
+
+
+/* ----------------------------------------------------------------
+   .btn span.arrow — Flecha animada dentro de cada botón
+   Referenciado en: index.html (<span class="arrow">▶</span>)
+   Aparece deslizándose al hacer hover sobre el botón.
+---------------------------------------------------------------- */
+.btn span.arrow {
+  display: inline-block;
+  opacity: 0;                         /* Invisible por defecto */
+  transform: translateX(-6px);        /* Desplazada a la izquierda */
+  transition: opacity .25s, transform .25s;
+  margin-right: 8px;
+  font-size: .85em;
+}
+.btn:hover span.arrow {
+  opacity: 1;                         /* Se hace visible al hover */
+  transform: translateX(0);           /* Vuelve a su posición natural */
+}
+
+
+/* ----------------------------------------------------------------
+   .version — Texto de versión bajo el panel del menú
+   Referenciado en: index.html  (<p class="version">)
+   Actualizar el texto en el HTML cuando suba de versión.
+---------------------------------------------------------------- */
+.version {
+  margin-top: 26px;
+  font-size: .65rem;
+  letter-spacing: .3em;
+  color: var(--gold-dk);
+  text-transform: uppercase;
+  animation: fadeIn 2s .9s ease both;
+}

@@ -1,0 +1,662 @@
+/* ================================================================
+   seleccion-mods.css — Pantalla de selección de mods
+   Referenciado en: seleccion-mods.html
+   Estética: pergamino oscuro + catálogo de librería medieval.
+   Layout: cabecera fija + dos columnas (lista | detalle) + pie fijo
+================================================================ */
+
+:root {
+  --gold:       #c9a84c;
+  --gold-lt:    #e8c96a;
+  --gold-dk:    #7a5c1a;
+  --bg:         #0a0a0f;
+  --bg2:        #0f0d09;
+  --panel:      rgba(14, 11, 6, 0.92);
+  --border:     rgba(201,168,76,.18);
+  --border-md:  rgba(201,168,76,.35);
+  --border-hi:  rgba(201,168,76,.7);
+  --text:       #c8b88a;
+  --text-dim:   #6b5a38;
+  --green:      #2a6e3f;
+  --green-lt:   #4caf72;
+  --red:        #8b1a1a;
+  --red-lt:     #c94444;
+  --tag-bg:     rgba(201,168,76,.1);
+
+  --hud-h:      64px;   /* Altura de la cabecera */
+  --pie-h:      72px;   /* Altura del pie */
+  --lista-w:    340px;  /* Ancho columna izquierda */
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Cinzel', serif;
+}
+
+/* ----------------------------------------------------------------
+   CANVAS DE FONDO HEXAGONAL
+   Dibujado por seleccion-mods.js (<canvas id="bg">)
+---------------------------------------------------------------- */
+canvas#bg {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: .35;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Viñeta sobre el canvas */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,.7) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ----------------------------------------------------------------
+   .stage — Contenedor raíz
+   Ocupa toda la pantalla, organiza cabecera + cuerpo + pie
+---------------------------------------------------------------- */
+.stage {
+  position: relative;
+  z-index: 10;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ================================================================
+   CABECERA
+================================================================ */
+.cabecera {
+  height: var(--hud-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+  backdrop-filter: blur(8px);
+  flex-shrink: 0;
+  gap: 16px;
+}
+
+.cabecera-left,
+.cabecera-right { flex: 1; }
+
+.cabecera-right { display: flex; justify-content: flex-end; }
+
+.cabecera-center {
+  text-align: center;
+  flex: 2;
+}
+
+.cabecera-sub {
+  font-size: .6rem;
+  letter-spacing: .45em;
+  color: var(--gold-dk);
+  text-transform: uppercase;
+}
+
+.cabecera-titulo {
+  font-family: 'Cinzel Decorative', cursive;
+  font-size: clamp(1rem, 2.2vw, 1.5rem);
+  color: transparent;
+  background: linear-gradient(160deg, var(--gold-lt) 20%, var(--gold) 60%, var(--gold-dk) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  letter-spacing: .06em;
+}
+
+/* Botón volver */
+.btn-volver {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--gold-dk);
+  font-family: 'Cinzel', serif;
+  font-size: .7rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: border-color .2s, color .2s;
+}
+.btn-volver:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+/* Badge nombre de partida */
+.partida-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+.partida-badge-label {
+  font-size: .55rem;
+  letter-spacing: .35em;
+  color: var(--gold-dk);
+  text-transform: uppercase;
+}
+.partida-badge-nombre {
+  font-size: .85rem;
+  letter-spacing: .12em;
+  color: var(--gold-lt);
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ================================================================
+   CUERPO — Dos columnas
+================================================================ */
+.cuerpo {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ----------------------------------------------------------------
+   COLUMNA IZQUIERDA — Lista de mods
+---------------------------------------------------------------- */
+.col-lista {
+  width: var(--lista-w);
+  flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  background: rgba(8,6,3,.6);
+  overflow: hidden;
+}
+
+.lista-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.lista-titulo {
+  font-size: .7rem;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--gold-dk);
+}
+.lista-contador {
+  font-size: .7rem;
+  letter-spacing: .15em;
+  color: var(--green-lt);
+}
+
+/* Contenedor scrollable de cards */
+.lista-mods {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.lista-mods::-webkit-scrollbar { width: 4px; }
+.lista-mods::-webkit-scrollbar-track { background: transparent; }
+.lista-mods::-webkit-scrollbar-thumb { background: var(--gold-dk); border-radius: 2px; }
+
+
+/* ----------------------------------------------------------------
+   .mod-card — Cada tarjeta en la lista
+   Generada dinámicamente por seleccion-mods.js
+   Al hacer click → seleccionarMod(id)
+---------------------------------------------------------------- */
+.mod-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  background: rgba(201,168,76,.02);
+  cursor: pointer;
+  transition: border-color .2s, background .2s;
+  position: relative;
+  border-radius: 2px;
+}
+.mod-card:hover {
+  border-color: var(--border-md);
+  background: rgba(201,168,76,.05);
+}
+/* Card seleccionada (resaltada en la lista) */
+.mod-card.activa {
+  border-color: var(--gold);
+  background: rgba(201,168,76,.08);
+}
+
+/* Thumbnail pequeño dentro de la card */
+.mod-card-thumb {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+  background: rgba(201,168,76,.05);
+  /* Placeholder visual si no hay imagen */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+}
+.mod-card-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mod-card-info {
+  flex: 1;
+  min-width: 0;
+}
+.mod-card-nombre {
+  font-size: .8rem;
+  letter-spacing: .1em;
+  color: var(--gold-lt);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mod-card-version {
+  font-size: .6rem;
+  letter-spacing: .1em;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+.mod-card-tags {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-top: 5px;
+}
+.mod-card-tag {
+  font-size: .55rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  background: var(--tag-bg);
+  border: 1px solid var(--border);
+  color: var(--gold-dk);
+  padding: 1px 5px;
+  border-radius: 1px;
+}
+
+/* Indicador ON/OFF a la derecha de la card
+   Verde = activo, rojo = inactivo
+   Controlado por seleccion-mods.js al hacer toggle */
+.mod-card-status {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--red-lt);
+  box-shadow: 0 0 6px var(--red-lt);
+  transition: background .3s, box-shadow .3s;
+}
+.mod-card-status.on {
+  background: var(--green-lt);
+  box-shadow: 0 0 6px var(--green-lt);
+}
+
+/* Badge "REQ" para mods requeridos */
+.mod-card-req {
+  position: absolute;
+  top: 4px;
+  right: 24px;
+  font-size: .5rem;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--gold-dk);
+  background: rgba(201,168,76,.1);
+  border: 1px solid var(--border);
+  padding: 1px 5px;
+}
+
+
+/* ----------------------------------------------------------------
+   COLUMNA DERECHA — Detalle del mod
+---------------------------------------------------------------- */
+.col-detalle {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px 36px;
+  display: flex;
+  flex-direction: column;
+}
+.col-detalle::-webkit-scrollbar { width: 4px; }
+.col-detalle::-webkit-scrollbar-track { background: transparent; }
+.col-detalle::-webkit-scrollbar-thumb { background: var(--gold-dk); border-radius: 2px; }
+
+/* Estado vacío */
+.detalle-vacio {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  opacity: .25;
+}
+.detalle-vacio-icono {
+  font-size: 3.5rem;
+  animation: girar 10s linear infinite;
+}
+@keyframes girar {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.detalle-vacio-texto {
+  font-size: .8rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 2;
+  color: var(--gold-dk);
+}
+
+/* Contenido del detalle */
+.detalle-contenido {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: fadeIn .3s ease both;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Thumbnail grande */
+.det-thumbnail-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/7;
+  border: 1px solid var(--border-md);
+  overflow: hidden;
+  border-radius: 2px;
+  background: rgba(201,168,76,.04);
+}
+.det-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.det-badge-req {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(10,8,4,.85);
+  border: 1px solid var(--gold-dk);
+  color: var(--gold);
+  font-size: .6rem;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+}
+
+.det-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+.det-nombre {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+  font-weight: 700;
+  color: var(--gold-lt);
+  letter-spacing: .08em;
+}
+.det-version {
+  font-size: .65rem;
+  letter-spacing: .2em;
+  color: var(--text-dim);
+}
+
+.det-autor {
+  font-size: .7rem;
+  letter-spacing: .2em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+/* Etiquetas */
+.det-etiquetas {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.det-etiqueta {
+  font-size: .62rem;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  background: var(--tag-bg);
+  border: 1px solid var(--border-md);
+  color: var(--gold);
+  padding: 3px 10px;
+  border-radius: 1px;
+}
+
+/* Separador */
+.det-sep {
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--border-md), transparent);
+}
+
+/* Descripción */
+.det-descripcion {
+  font-family: 'IM Fell English', serif;
+  font-size: .95rem;
+  line-height: 1.8;
+  color: var(--text);
+  font-style: italic;
+}
+
+/* Dependencias */
+.det-deps {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .7rem;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+}
+.det-deps-label { color: var(--gold-dk); }
+.det-deps-lista { color: var(--gold); }
+
+/* Botón toggle activar/desactivar */
+.btn-toggle {
+  margin-top: 4px;
+  background: rgba(42,110,63,.08);
+  border: 1px solid rgba(42,110,63,.6);
+  color: var(--green-lt);
+  font-family: 'Cinzel', serif;
+  font-size: .8rem;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  padding: 12px 24px;
+  cursor: pointer;
+  transition: background .2s, border-color .2s, color .2s;
+  align-self: flex-start;
+}
+.btn-toggle:hover {
+  background: rgba(42,110,63,.18);
+  border-color: var(--green-lt);
+}
+/* Estado: mod activo → botón rojo para desactivar */
+.btn-toggle.desactivar {
+  background: rgba(139,26,26,.08);
+  border-color: rgba(139,26,26,.6);
+  color: var(--red-lt);
+}
+.btn-toggle.desactivar:hover {
+  background: rgba(139,26,26,.18);
+  border-color: var(--red-lt);
+}
+/* Mod requerido: botón deshabilitado */
+.btn-toggle:disabled {
+  opacity: .35;
+  cursor: not-allowed;
+}
+
+/* ================================================================
+   PIE — Botón iniciar juego
+================================================================ */
+.pie {
+  height: var(--pie-h);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 20px;
+  padding: 0 28px;
+  border-top: 1px solid var(--border);
+  background: var(--panel);
+  backdrop-filter: blur(8px);
+  flex-shrink: 0;
+}
+
+.pie-hint {
+  font-size: .65rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  flex: 1;
+}
+
+.btn-jugar {
+  background: rgba(42,110,63,.1);
+  border: 1px solid rgba(42,110,63,.5);
+  color: var(--green-lt);
+  font-family: 'Cinzel', serif;
+  font-size: .85rem;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  padding: 14px 36px;
+  cursor: pointer;
+  transition: background .2s, border-color .2s, color .2s, opacity .2s;
+  position: relative;
+  overflow: hidden;
+}
+.btn-jugar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(42,110,63,.15), transparent);
+  transform: translateX(-100%);
+  transition: transform .4s ease;
+}
+.btn-jugar:hover:not(:disabled)::before { transform: translateX(100%); }
+.btn-jugar:hover:not(:disabled) {
+  background: rgba(42,110,63,.2);
+  border-color: var(--green-lt);
+}
+.btn-jugar:disabled {
+  opacity: .3;
+  cursor: not-allowed;
+}
+
+
+/* ================================================================
+   SELECTOR DE TAMAÑO DEL MUNDO
+   Añadido al pie de seleccion-mods.html
+   Referenciado en: seleccion-mods.html (.tamano-wrap)
+   Lógica de selección: seleccion-mods.js → elegirTamano()
+================================================================ */
+
+/* El pie ahora tiene dos zonas: izquierda (tamaño) y derecha (hint+botón) */
+.pie {
+  height: auto;
+  min-height: var(--pie-h);
+  padding: 12px 28px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Zona izquierda: selector de tamaño */
+.tamano-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tamano-label {
+  font-size: .6rem;
+  letter-spacing: .35em;
+  text-transform: uppercase;
+  color: var(--gold-dk);
+}
+
+.tamano-opciones {
+  display: flex;
+  gap: 8px;
+}
+
+/* ----------------------------------------------------------------
+   .tamano-btn — Cada botón de tamaño (Pequeño / Mediano / Grande)
+   Estado activo: .tamano-activo (por defecto: Mediano)
+   Al hacer click → elegirTamano() en seleccion-mods.js
+---------------------------------------------------------------- */
+.tamano-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: rgba(201,168,76,.03);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-family: 'Cinzel', serif;
+  padding: 8px 18px;
+  cursor: pointer;
+  transition: border-color .2s, color .2s, background .2s;
+  min-width: 80px;
+}
+.tamano-btn:hover {
+  border-color: var(--border-md);
+  color: var(--gold);
+  background: rgba(201,168,76,.06);
+}
+
+/* Estado seleccionado */
+.tamano-btn.tamano-activo {
+  border-color: var(--gold);
+  color: var(--gold-lt);
+  background: rgba(201,168,76,.1);
+}
+
+.tamano-icono {
+  font-size: .75rem;
+  letter-spacing: .05em;
+  color: inherit;
+}
+.tamano-nombre {
+  font-size: .65rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+}
+
+/* Zona derecha: hint + botón jugar */
+.pie-derecha {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
